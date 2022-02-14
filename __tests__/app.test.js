@@ -52,8 +52,8 @@ describe('/api/articles/:article_id', () => {
 							author: 'butter_bridge',
 							body: 'I find this existence challenging',
 							created_at: expect.any(String),
-                            votes: 100,
-                            article_id:1
+							votes: 100,
+							article_id: 1,
 						})
 					);
 				});
@@ -72,11 +72,54 @@ describe('/api/articles/:article_id', () => {
 							author: 'icellusedkars',
 							body: 'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.',
 							created_at: expect.any(String),
-                            votes: 0,
-                            article_id: 2
+							votes: 0,
+							article_id: 2,
 						})
 					);
 				});
+		});
+	});
+	describe('PATCH', () => {
+		test('should respond with an updated article object based on the received object', () => {
+			return request(app)
+				.patch('/api/articles/1')
+				.send({ inc_votes: 1 })
+				.expect(200)
+				.then(({ body }) => {
+					const { article } = body;
+					expect(article).toBeInstanceOf(Object);
+					expect(article).toEqual(
+						expect.objectContaining({
+							title: 'Living in the shadow of a great man',
+							topic: 'mitch',
+							author: 'butter_bridge',
+							body: 'I find this existence challenging',
+							created_at: expect.any(String),
+							votes: 101,
+							article_id: 1,
+						})
+					);
+				});
+		});
+		describe('PATCH errors', () => {
+			test('should respond with an error message when given an invalid id', () => {
+				return request(app)
+					.patch('/api/articles/Invalid_id')
+					.send({ inc_votes: 1 })
+					.expect(400)
+					.then(({ body }) => {
+						expect(body.msg).toBe('400 - Bad request');
+					});
+			});
+			test('should respond with an error message when given an invalid update object', () => {
+				return request(app)
+					.patch('/api/articles/1')
+					.send({ notAVaildProperty: 'Not a value' })
+					.expect(400)
+					.then(({ body }) => {
+						expect(body.msg).toBe('400 - Bad request');
+					});
+			});
 		});
 	});
 });
