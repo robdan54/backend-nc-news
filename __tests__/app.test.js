@@ -79,6 +79,49 @@ describe('/api/articles/:article_id', () => {
 				});
 		});
 	});
+	describe('PATCH', () => {
+		test('should respond with an updated article object based on the received object', () => {
+			return request(app)
+				.patch('/api/articles/1')
+				.send({ inc_votes: 1 })
+				.expect(200)
+				.then(({ body }) => {
+					const { article } = body;
+					expect(article).toBeInstanceOf(Object);
+					expect(article).toEqual(
+						expect.objectContaining({
+							title: 'Living in the shadow of a great man',
+							topic: 'mitch',
+							author: 'butter_bridge',
+							body: 'I find this existence challenging',
+							created_at: expect.any(String),
+							votes: 101,
+							article_id: 1,
+						})
+					);
+				});
+		});
+		describe('PATCH errors', () => {
+			test('should respond with an error message when given an invalid id', () => {
+				return request(app)
+					.patch('/api/articles/Invalid_id')
+					.send({ inc_votes: 1 })
+					.expect(400)
+					.then(({ body }) => {
+						expect(body.msg).toBe('400 - Bad request');
+					});
+			});
+			test('should respond with an error message when given an invalid update object', () => {
+				return request(app)
+					.patch('/api/articles/1')
+					.send({ notAVaildProperty: 'Not a value' })
+					.expect(400)
+					.then(({ body }) => {
+						expect(body.msg).toBe('400 - Bad request');
+					});
+			});
+		});
+	});
 });
 
 describe('/api/users', () => {
