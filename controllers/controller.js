@@ -1,9 +1,12 @@
 /** @format */
 
+
+const res = require('express/lib/response');
 const {
 	selectTopics,
 	selectArticleById,
-	patchArticle,
+	selectUsers,
+
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -20,6 +23,13 @@ exports.fetchArticle = (req, res, next) => {
 	});
 };
 
+
+exports.fetchUsers = (req, res, next) => {
+    selectUsers().then((users) => {
+		res.status(200).send({ users });
+	});
+
+
 exports.updateArticle = (req, res, next) => {
 	const { inc_votes } = req.body;
     const articleId = req.params.article_id;
@@ -28,4 +38,5 @@ exports.updateArticle = (req, res, next) => {
 	patchArticle(inc_votes, articleId).then((article) => {
 		res.status(200).send({ article });
 	}).catch(next);
+
 };

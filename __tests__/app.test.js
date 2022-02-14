@@ -124,6 +124,28 @@ describe('/api/articles/:article_id', () => {
 	});
 });
 
+describe('/api/users', () => {
+	describe('GET', () => {
+		test('should respond with an array of user objects with a username property', () => {
+			return request(app)
+				.get('/api/users')
+				.expect(200)
+				.then(({ body }) => {
+                    const { users } = body;
+                    expect(users).toBeInstanceOf(Array)
+                    expect(users.length).toEqual(4)
+                    users.forEach((user) => {
+                        expect(user).toEqual(
+                            expect.objectContaining({
+                                username: expect.any(String)
+                            })
+                        )
+                    })
+				});
+		});
+	});
+});
+
 describe('Global Errors', () => {
 	test('should return 404 - path not found when given a non existent path', () => {
 		return request(app)
