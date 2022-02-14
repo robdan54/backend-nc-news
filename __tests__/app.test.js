@@ -21,7 +21,8 @@ describe('/api/topics', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { topics } = body;
-					expect(topics).toBeInstanceOf(Array);
+                    expect(topics).toBeInstanceOf(Array);
+                    expect(topics.length).toBe(3)
 					topics.forEach((topic) => {
 						expect(topic).toEqual(
 							expect.objectContaining({
@@ -32,5 +33,16 @@ describe('/api/topics', () => {
 					});
 				});
 		});
+	});
+});
+
+describe('Global Errors', () => {
+	test('should return 404 - path not found when given a non existent path', () => {
+		return request(app)
+			.get('/not-a-path')
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe('404 - path not found');
+			});
 	});
 });
