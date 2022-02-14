@@ -1,6 +1,11 @@
 /** @format */
 
-const { selectTopics, selectArticleById } = require('../models/model.js');
+const res = require('express/lib/response');
+const {
+	selectTopics,
+	selectArticleById,
+	selectUsers,
+} = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
 	selectTopics().then((topics) => {
@@ -9,10 +14,15 @@ exports.fetchTopics = (req, res, next) => {
 };
 
 exports.fetchArticle = (req, res, next) => {
+	const articleId = req.params.article_id;
 
-    const articleId = req.params.article_id
+	selectArticleById(articleId).then((article) => {
+		res.status(200).send({ article });
+	});
+};
 
-    selectArticleById(articleId).then((article) => {
-			res.status(200).send({ article });
-		});
+exports.fetchUsers = (req, res, next) => {
+    selectUsers().then((users) => {
+		res.status(200).send({ users });
+	});
 };
