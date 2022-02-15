@@ -4,9 +4,10 @@ const express = require('express');
 
 const {
 	fetchTopics,
-	fetchArticle,
+	fetchArticles,
 	fetchUsers,
 	updateArticle,
+	fetchArticleById,
 } = require('./controllers/controller');
 
 const {
@@ -24,8 +25,8 @@ app.get('/api/topics', fetchTopics);
 
 //articles
 
-app.get('/api/articles', fetchArticle);
-app.get('/api/articles/:article_id', fetchArticle);
+app.get('/api/articles', fetchArticles);
+app.get('/api/articles/:article_id', fetchArticleById);
 app.patch('/api/articles/:article_id', updateArticle);
 
 //users

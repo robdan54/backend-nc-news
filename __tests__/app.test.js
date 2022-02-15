@@ -170,6 +170,16 @@ describe('/api/articles', () => {
 					});
 				});
 		});
+		test('should be sorted by date in descending order', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles).toBeInstanceOf(Array);
+					expect(articles).toBeSortedBy('created_at', {descending: true})
+				});
+		});
 	});
 });
 

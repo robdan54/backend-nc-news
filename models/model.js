@@ -9,17 +9,20 @@ exports.selectTopics = async () => {
 	return topics.rows;
 };
 
+exports.selectArticles = async () => {
+	const articles = await db.query(
+		`SELECT * FROM articles
+		ORDER BY created_at DESC`)
+	return articles.rows
+}
+
 exports.selectArticleById = async (articleId) => {
-	let queryStr = `SELECT * FROM articles`;
-	const queryValues = [];
-
-	if (articleId) {
-		queryValues.push(articleId);
-		queryStr += ` WHERE article_id = $1`;
-	}
-
-	const article = await db.query(queryStr, queryValues);
-	return article.rows;
+	const article = await db.query(
+		`SELECT * FROM articles
+		 WHERE article_id = $1`,
+		[articleId]
+	);
+	return article.rows[0];
 };
 
 exports.selectUsers = async () => {
