@@ -6,7 +6,7 @@ const {
 	selectTopics,
 	selectArticleById,
 	selectUsers,
-
+	patchArticle,
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -18,16 +18,21 @@ exports.fetchTopics = (req, res, next) => {
 exports.fetchArticle = (req, res, next) => {
 	const articleId = req.params.article_id;
 
-	selectArticleById(articleId).then((article) => {
-		res.status(200).send({ article });
-	});
+	selectArticleById(articleId).then((articles) => {
+		if (articles.length > 1) {
+			res.status(200).send({ articles });
+		} else {
+			res.status(200).send({ article: articles[0] });
+		}
+	}).catch(next)
 };
 
 
 exports.fetchUsers = (req, res, next) => {
     selectUsers().then((users) => {
-		res.status(200).send({ users });
-	});
+        res.status(200).send({ users });
+    });
+}
 
 
 exports.updateArticle = (req, res, next) => {
@@ -39,4 +44,4 @@ exports.updateArticle = (req, res, next) => {
 		res.status(200).send({ article });
 	}).catch(next);
 
-};
+}

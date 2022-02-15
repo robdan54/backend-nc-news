@@ -131,16 +131,43 @@ describe('/api/users', () => {
 				.get('/api/users')
 				.expect(200)
 				.then(({ body }) => {
-                    const { users } = body;
-                    expect(users).toBeInstanceOf(Array)
-                    expect(users.length).toEqual(4)
-                    users.forEach((user) => {
-                        expect(user).toEqual(
-                            expect.objectContaining({
-                                username: expect.any(String)
-                            })
-                        )
-                    })
+					const { users } = body;
+					expect(users).toBeInstanceOf(Array);
+					expect(users.length).toEqual(4);
+					users.forEach((user) => {
+						expect(user).toEqual(
+							expect.objectContaining({
+								username: expect.any(String),
+							})
+						);
+					});
+				});
+		});
+	});
+});
+
+describe('/api/articles', () => {
+	describe('GET', () => {
+		test('Should respond with an array of article objects', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles).toBeInstanceOf(Array);
+					expect(articles.length).toBe(12);
+					articles.forEach((article) => {
+						expect(article).toEqual(
+							expect.objectContaining({
+								author: expect.any(String),
+								title: expect.any(String),
+								article_id: expect.any(Number),
+								topic: expect.any(String),
+								created_at: expect.any(String),
+								votes: expect.any(Number),
+							})
+						);
+					});
 				});
 		});
 	});

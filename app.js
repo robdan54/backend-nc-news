@@ -5,8 +5,8 @@ const express = require('express');
 const {
 	fetchTopics,
 	fetchArticle,
-  fetchUsers,
-  updateArticle,
+	fetchUsers,
+	updateArticle,
 } = require('./controllers/controller');
 
 const {
@@ -15,19 +15,24 @@ const {
 	handleServerErrors,
 } = require('./Errors/error-handling.js');
 
-
 const app = express();
 app.use(express.json());
 
+//topics
+
 app.get('/api/topics', fetchTopics);
 
-app.get('/api/articles/:article_id', fetchArticle);
+//articles
 
+app.get('/api/articles', fetchArticle);
+app.get('/api/articles/:article_id', fetchArticle);
+app.patch('/api/articles/:article_id', updateArticle);
+
+//users
 
 app.get('/api/users', fetchUsers);
 
-app.patch('/api/articles/:article_id', updateArticle);
-
+//errors
 
 app.all('/*', (req, res) => {
 	res.status(404).send({ msg: '404 - path not found' });

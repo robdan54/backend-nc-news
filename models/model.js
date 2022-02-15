@@ -10,23 +10,24 @@ exports.selectTopics = async () => {
 };
 
 exports.selectArticleById = async (articleId) => {
-	const article = await db.query(
-		`
+	let queryStr = `SELECT * FROM articles`;
+	const queryValues = [];
 
-                                    SELECT * FROM articles WHERE article_id = $1
+	if (articleId) {
+		queryValues.push(articleId);
+		queryStr += ` WHERE article_id = $1`;
+	}
 
-                                    `,
-		[articleId]
-	);
-	return article.rows[0];
+	const article = await db.query(queryStr, queryValues);
+	return article.rows;
 };
-
 
 exports.selectUsers = async () => {
 	const users = await db.query(`
                                 SELECT username FROM users;
     `);
-    return users.rows
+	return users.rows;
+};
 
 exports.patchArticle = async (inc_votes, articleID) => {
 	try {
@@ -44,5 +45,4 @@ exports.patchArticle = async (inc_votes, articleID) => {
 	} catch (err) {
 		return Promise.reject({ status: 400, msg: '400 - Bad request' });
 	}
-
 };
