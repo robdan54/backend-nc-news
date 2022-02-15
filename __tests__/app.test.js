@@ -78,18 +78,29 @@ describe('/api/articles/:article_id', () => {
 					);
 				});
 		});
-		describe('GET ERRORS', () => {
-			test('should return 404 resource not found if given a valid id type, but the id does not exist', () => {
-				return request(app)
-					.get('/api/articles/999999')
-					.expect(404)
-					.then(({ body }) => {
-						const { msg } = body;
-						expect(msg).toBe('Resource not found');
-					});
-			});
+		test('should include a comment counter in the article object', () => {
+			return request(app)
+				.get('/api/articles/1')
+				.expect(200)
+				.then(({ body }) => {
+					const { article } = body;
+					expect(article.comment_count).toBe(11);
+				});
 		});
 	});
+
+	describe('GET ERRORS', () => {
+		test('should return 404 resource not found if given a valid id type, but the id does not exist', () => {
+			return request(app)
+				.get('/api/articles/999999')
+				.expect(404)
+				.then(({ body }) => {
+					const { msg } = body;
+					expect(msg).toBe('Resource not found');
+				});
+		});
+	});
+
 	describe('PATCH', () => {
 		test('should respond with an updated article object based on the received object', () => {
 			return request(app)
@@ -189,6 +200,21 @@ describe('/api/articles', () => {
 					const { articles } = body;
 					expect(articles).toBeInstanceOf(Array);
 					expect(articles).toBeSortedBy('created_at', { descending: true });
+				});
+		});
+		test('should include a comment counter in the article object', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					articles.forEach((article) => {
+						expect(article).toEqual(
+							expect.objectContaining({
+								comment_count: expect.any(Number),
+							})
+						);
+					});
 				});
 		});
 	});
