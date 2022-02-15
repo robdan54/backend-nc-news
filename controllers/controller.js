@@ -7,6 +7,7 @@ const {
 	selectUsers,
 	patchArticle,
 	selectArticles,
+	doesResourceExist,
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -17,18 +18,18 @@ exports.fetchTopics = (req, res, next) => {
 
 exports.fetchArticles = (req, res, next) => {
 	selectArticles().then((articles) => {
-		res.status(200).send({articles})
-	})
+		res.status(200).send({ articles });
+	});
 };
 
 exports.fetchArticleById = (req, res, next) => {
 	const articleId = req.params.article_id;
-
-	selectArticleById(articleId)
-		.then((article) => {
-			res.status(200).send({ article });
-		})
-		.catch(next);
+	Promise.all([
+		selectArticleById(articleId),
+		doesResourceExist('articles', 'article_id', articleId),
+	]).then(([article]) => {
+		res.status(200).send({article})
+	}).catch(next);
 };
 
 exports.fetchUsers = (req, res, next) => {

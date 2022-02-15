@@ -78,6 +78,17 @@ describe('/api/articles/:article_id', () => {
 					);
 				});
 		});
+		describe('GET ERRORS', () => {
+			test('should return 404 resource not found if given a valid id type, but the id does not exist', () => {
+				return request(app)
+					.get('/api/articles/999999')
+					.expect(404)
+					.then(({ body }) => {
+						const { msg } = body;
+						expect(msg).toBe('Resource not found');
+					});
+			});
+		});
 	});
 	describe('PATCH', () => {
 		test('should respond with an updated article object based on the received object', () => {
@@ -177,7 +188,7 @@ describe('/api/articles', () => {
 				.then(({ body }) => {
 					const { articles } = body;
 					expect(articles).toBeInstanceOf(Array);
-					expect(articles).toBeSortedBy('created_at', {descending: true})
+					expect(articles).toBeSortedBy('created_at', { descending: true });
 				});
 		});
 	});
