@@ -78,6 +78,17 @@ describe('/api/articles/:article_id', () => {
 					);
 				});
 		});
+		describe('GET ERRORS', () => {
+			test('should return 404 resource not found if given a valid id type, but the id does not exist', () => {
+				return request(app)
+					.get('/api/articles/999999')
+					.expect(404)
+					.then(({ body }) => {
+						const { msg } = body;
+						expect(msg).toBe('Resource not found');
+					});
+			});
+		});
 	});
 	describe('PATCH', () => {
 		test('should respond with an updated article object based on the received object', () => {
@@ -131,16 +142,53 @@ describe('/api/users', () => {
 				.get('/api/users')
 				.expect(200)
 				.then(({ body }) => {
-                    const { users } = body;
-                    expect(users).toBeInstanceOf(Array)
-                    expect(users.length).toEqual(4)
-                    users.forEach((user) => {
-                        expect(user).toEqual(
-                            expect.objectContaining({
-                                username: expect.any(String)
-                            })
-                        )
-                    })
+					const { users } = body;
+					expect(users).toBeInstanceOf(Array);
+					expect(users.length).toEqual(4);
+					users.forEach((user) => {
+						expect(user).toEqual(
+							expect.objectContaining({
+								username: expect.any(String),
+							})
+						);
+					});
+				});
+		});
+	});
+});
+
+describe('/api/articles', () => {
+	describe('GET', () => {
+		test('Should respond with an array of article objects', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles).toBeInstanceOf(Array);
+					expect(articles.length).toBe(12);
+					articles.forEach((article) => {
+						expect(article).toEqual(
+							expect.objectContaining({
+								author: expect.any(String),
+								title: expect.any(String),
+								article_id: expect.any(Number),
+								topic: expect.any(String),
+								created_at: expect.any(String),
+								votes: expect.any(Number),
+							})
+						);
+					});
+				});
+		});
+		test('should be sorted by date in descending order', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles).toBeInstanceOf(Array);
+					expect(articles).toBeSortedBy('created_at', { descending: true });
 				});
 		});
 	});
