@@ -1,7 +1,7 @@
 /** @format */
 
 const db = require('../db/connection');
-const format = require('pg-format')
+const format = require('pg-format');
 
 exports.selectTopics = async () => {
 	const topics = await db.query(`
@@ -13,7 +13,7 @@ exports.selectTopics = async () => {
 exports.selectArticles = async () => {
 	const articles = await db.query(
 		`SELECT * FROM articles
-		ORDER BY created_at DESC`
+		ORDER BY created_at DESC;`
 	);
 	return articles.rows;
 };
@@ -21,7 +21,7 @@ exports.selectArticles = async () => {
 exports.selectArticleById = async (articleId) => {
 	const article = await db.query(
 		`SELECT * FROM articles
-		 WHERE article_id = $1`,
+		 WHERE article_id = $1;`,
 		[articleId]
 	);
 	return article.rows[0];
@@ -29,7 +29,7 @@ exports.selectArticleById = async (articleId) => {
 
 exports.selectUsers = async () => {
 	const users = await db.query(`
-                                SELECT username FROM users;
+        SELECT username FROM users;
     `);
 	return users.rows;
 };
@@ -51,12 +51,11 @@ exports.patchArticle = async (inc_votes, articleID) => {
 };
 
 exports.doesResourceExist = async (table, column, value) => {
-	let queryStr = format(`SELECT * FROM %I WHERE %I = $1`, table, column)
+	let queryStr = format(`SELECT * FROM %I WHERE %I = $1;`, table, column);
 
 	const testId = await db.query(queryStr, [value]);
 
 	if (testId.rows.length === 0) {
-		return Promise.reject({status : 404, msg: "Resource not found"})
+		return Promise.reject({ status: 404, msg: 'Resource not found' });
 	}
-
 };
