@@ -245,10 +245,7 @@ describe('/api/articles/:article_id/comments', () => {
 				.get('/api/articles/2/comments')
 				.expect(200)
 				.then(({ body: { comments } }) => {
-					comments.forEach((comment) => {
-						expect(comment).toEqual([])
-						
-					});
+					expect(comments).toEqual([]);
 				});
 		});
 		describe('GET ERRORS', () => {
