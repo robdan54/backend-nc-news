@@ -19,17 +19,6 @@ exports.selectArticles = async () => {
 		 ORDER BY created_at DESC;`
 	);
 
-	// articles.rows.forEach(async (article) => {
-	// 	const articleId = article.article_id;
-	// 	const comment_counter = await db.query(
-	// 		`
-	// 	SELECT COUNT(comment_id) FROM comments
-	// 	WHERE article_id = $1;
-	// `,
-	// 		[articleId]
-	// 	);
-	// 	article.comment_count = Number.parseInt(comment_counter.rows[0].count);
-	// });
 	return articles.rows;
 };
 
@@ -43,11 +32,6 @@ exports.selectArticleById = async (articleId) => {
 		[articleId]
 	);
 	
-
-	// article.rows[0].comment_count = Number.parseInt(
-	// 	comment_counter.rows[0].count
-	// );
-
 	return article.rows[0];
 };
 
