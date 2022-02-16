@@ -220,6 +220,58 @@ describe('/api/articles', () => {
 	});
 });
 
+describe('/api/articles/:article_id/comments', () => {
+	describe('GET', () => {
+		test('should respond with an  array of comment objects related to the given article', () => {
+			return request(app)
+				.get('/api/articles/1/comments')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					comments.forEach((comment) => {
+						expect(comment).toEqual(
+							expect.objectContaining({
+								comment_id: expect.any(Number),
+								votes: expect.any(Number),
+								created_at: expect.any(String),
+								author: expect.any(String),
+								body: expect.any(String),
+							})
+						);
+					});
+				});
+		});
+		test('should respond with an empty comments array if the id given has no comments', () => {
+			return request(app)
+				.get('/api/articles/2/comments')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					comments.forEach((comment) => {
+						expect(comment).toEqual([])
+						
+					});
+				});
+		});
+		describe('GET ERRORS', () => {
+			test('should return 404 resource not found if given a valid id but the article does not exist ', () => {
+				return request(app)
+					.get('/api/articles/99999/comments')
+					.expect(404)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Resource not found');
+					});
+			});
+			test('should return 400 bad request if given an invalid id format', () => {
+				return request(app)
+					.get('/api/articles/not-an-Id/comments')
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			});
+		});
+	});
+});
+
 describe('Global Errors', () => {
 	test('should return 404 - path not found when given a non existent path', () => {
 		return request(app)
