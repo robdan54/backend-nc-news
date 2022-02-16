@@ -67,3 +67,10 @@ exports.doesResourceExist = async (table, column, value) => {
 		return Promise.reject({ status: 404, msg: 'Resource not found' });
 	}
 };
+
+exports.selectCommentsByArticle = async (articleId) => {
+	const { rows } = await db.query(`SELECT * FROM comments
+	WHERE article_id = $1;`, [articleId])
+	
+	return rows
+}
