@@ -12,18 +12,26 @@ exports.selectTopics = async () => {
 
 exports.selectArticles = async () => {
 	const articles = await db.query(
-		`SELECT * FROM articles
-		ORDER BY created_at DESC;`
+		`SELECT articles.*, CAST(COUNT(comment_id) AS INT) AS comment_count
+		 FROM articles 
+		 LEFT JOIN comments ON comments.article_id = articles.article_id
+		 GROUP BY articles.article_id
+		 ORDER BY created_at DESC;`
 	);
+
 	return articles.rows;
 };
 
 exports.selectArticleById = async (articleId) => {
 	const article = await db.query(
-		`SELECT * FROM articles
-		 WHERE article_id = $1;`,
+		`SELECT articles.*, CAST(COUNT(comment_id) AS INT) AS comment_count
+		 FROM articles 
+		 LEFT JOIN comments ON comments.article_id = articles.article_id
+		 WHERE articles.article_id = $1
+		 GROUP BY articles.article_id;`,
 		[articleId]
 	);
+	
 	return article.rows[0];
 };
 
