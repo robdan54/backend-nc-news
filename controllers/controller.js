@@ -19,10 +19,10 @@ exports.fetchTopics = (req, res, next) => {
 };
 
 exports.fetchArticles = (req, res, next) => {
-	const { sort_by } = req.query;
-	selectArticles(sort_by).then((articles) => {
+	const { sort_by, order, topic } = req.query;
+	selectArticles(sort_by, order, topic).then((articles) => {
 		res.status(200).send({ articles });
-	});
+	}).catch(next);
 };
 
 exports.fetchArticleById = (req, res, next) => {

@@ -10,8 +10,11 @@ exports.selectTopics = async () => {
 	return topics.rows;
 };
 
-exports.selectArticles = async (sort_by) => {
+exports.selectArticles = async (sort_by, order, topic) => {
 	if (!sort_by) sort_by = 'created_at';
+	if (!order) order = 'DESC';
+
+	const validOrder = ['DESC', 'ASC'];
 
 	const validSortBys = [
 		'created_at',
@@ -23,18 +26,36 @@ exports.selectArticles = async (sort_by) => {
 		'comment_count',
 	];
 
-	if (validSortBys.includes(sort_by)) {
-		const articles = await db.query(
-			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comment_id) AS INT) AS comment_count
-			 FROM articles 
-			 LEFT JOIN comments ON comments.article_id = articles.article_id
-			 GROUP BY articles.article_id
-			 ORDER BY ${sort_by} DESC;`
-		);
-		return articles.rows;
-	} else {
-		return Promise.reject({status : 400, msg : 'Invalid sort_by'})
+	const queryArr = [];
+
+	let queryStr = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comment_id) AS INT) AS comment_count
+				 	FROM articles 
+				 	LEFT JOIN comments ON comments.article_id = articles.article_id`;
+
+	if (topic) {
+		queryStr += ' WHERE topic = $1';
+		queryArr.push(topic);
 	}
+
+	queryStr += ` GROUP BY articles.article_id`;
+
+	if (validSortBys.includes(sort_by)) {
+		if (validOrder.includes(order.toUpperCase())) {
+			queryStr += ` ORDER BY ${sort_by} ${order}`;
+		} else {
+			return Promise.reject({ status: 400, msg: 'Invalid order' });
+		}
+	} else {
+		return Promise.reject({ status: 400, msg: 'Invalid sort_by' });
+	}
+
+	const { rows } = await db.query(queryStr + ';', queryArr);
+
+	if (rows.length === 0) {
+		return Promise.reject({ status: 404, msg: 'Topic not found' });
+	}
+
+	return rows;
 };
 
 exports.selectArticleById = async (articleId) => {
@@ -86,7 +107,7 @@ exports.doesResourceExist = async (table, column, value) => {
 exports.selectCommentsByArticle = async (articleId) => {
 	const { rows } = await db.query(
 		`SELECT * FROM comments
-	WHERE article_id = $1;`,
+		WHERE article_id = $1;`,
 		[articleId]
 	);
 
