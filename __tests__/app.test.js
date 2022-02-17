@@ -415,6 +415,49 @@ describe('/api/articles/:article_id/comments', () => {
 	});
 });
 
+describe('/api/comments/:comment_id', () => {
+	describe('DELETE', () => {
+		test('should respond 204 and no content', () => {
+			return request(app).delete('/api/comments/1').expect(204).then(({body}) => {
+				expect(body).toEqual({})
+			})
+		});
+		test('should remove the comment from the data base', () => {
+			return request(app).delete('/api/comments/16').expect(204).then(() => {
+				return request(app).get('/api/articles/6/comments').expect(200)
+			}).then(({ body:{comments} }) => {
+				expect(comments).toEqual([])
+			})
+		});
+		test('should update comment count on articles when comments are deleted', () => {
+			return request(app)
+				.delete('/api/comments/16')
+				.expect(204)
+				.then(() => {
+					return request(app).get('/api/articles/6').expect(200);
+				})
+				.then(({ body: { article } }) => {
+					expect(article.comment_count).toBe(0);
+				});
+		})
+		describe('DELETE ERRORS', () => {
+			test('should respond with 404 - Resource not found if given an id that does not exist', () => {
+				return request(app).delete('/api/comments/99999').expect(404).then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found')
+				});
+			});
+			test('should respond with 400 - Bad request if given an invalid comment id', () => {
+				return request(app)
+					.delete('/api/comments/Not-an-id')
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			})
+		});
+	});
+});
+
 describe('Global Errors', () => {
 	test('should return 404 - path not found when given a non existent path', () => {
 		return request(app)
