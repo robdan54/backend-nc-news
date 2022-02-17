@@ -19,9 +19,10 @@ exports.fetchTopics = (req, res, next) => {
 };
 
 exports.fetchArticles = (req, res, next) => {
-	selectArticles().then((articles) => {
+	const { sort_by, order, topic } = req.query;
+	selectArticles(sort_by, order, topic).then((articles) => {
 		res.status(200).send({ articles });
-	});
+	}).catch(next);
 };
 
 exports.fetchArticleById = (req, res, next) => {
@@ -69,7 +70,7 @@ exports.sendComment = (req, res, next) => {
 	const articleId = req.params.article_id;
 	const { body } = req;
 
-	doesResourceExist('articles', 'article_id', articleId)      //need to check if resource exists before trying to post as otherwise violates foreign key constraint in comments table
+	doesResourceExist('articles', 'article_id', articleId) //need to check if resource exists before trying to post as otherwise violates foreign key constraint in comments table
 		.then(() => {
 			return postComment(body, articleId);
 		})

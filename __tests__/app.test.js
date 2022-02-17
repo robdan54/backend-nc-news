@@ -217,6 +217,73 @@ describe('/api/articles', () => {
 					});
 				});
 		});
+		describe('Queries', () => {
+			test('should allow the user to specify a column to sort_by and sort by that column defaults to descending', () => {
+				const article_idTest = request(app)
+					.get('/api/articles?sort_by=article_id')
+					.expect(200)
+					.then(({ body }) => {
+						const { articles } = body;
+						expect(articles).toBeSortedBy('article_id', { descending: true });
+					});
+				const comment_countTest = request(app)
+					.get('/api/articles?sort_by=comment_count')
+					.expect(200)
+					.then(({ body }) => {
+						const { articles } = body;
+						expect(articles).toBeSortedBy('comment_count', {
+							descending: true,
+						});
+					});
+				return Promise.all([article_idTest, comment_countTest]);
+			});
+			test('should allow a user to specify ordering', () => {
+				return request(app)
+					.get('/api/articles?order=asc')
+					.expect(200)
+					.then(({ body }) => {
+						const { articles } = body;
+						expect(articles).toBeSortedBy('created_at', { descending: false });
+					});
+			});
+			test('should allow a user to filter by topic', () => {
+				return request(app)
+					.get('/api/articles?topic=mitch')
+					.expect(200)
+					.then(({ body }) => {
+						const { articles } = body;
+						articles.forEach((article) => {
+							expect(article.topic).toBe('mitch');
+						});
+					});
+			});
+			describe('Query ERRORS', () => {
+				test('should return 400 invalid sort_by if given an incorrect sort_by', () => {
+					return request(app)
+						.get('/api/articles?sort_by=InvalidSortBy')
+						.expect(400)
+						.then(({ body: { msg } }) => {
+							expect(msg).toBe('Invalid sort_by');
+						});
+				});
+				test('should return 400 invalid order if given an incorrect order', () => {
+					return request(app)
+						.get('/api/articles?order=InvalidOrder')
+						.expect(400)
+						.then(({ body: { msg } }) => {
+							expect(msg).toBe('Invalid order');
+						});
+				});
+				test('should return 404 topic not found if given a valid but non existent incorrect topic', () => {
+					return request(app)
+						.get('/api/articles?topic=notATopic')
+						.expect(404)
+						.then(({ body: { msg } }) => {
+							expect(msg).toBe('Topic not found');
+						});
+				});
+			});
+		});
 	});
 });
 
@@ -246,6 +313,7 @@ describe('/api/articles/:article_id/comments', () => {
 				.get('/api/articles/2/comments')
 				.expect(200)
 				.then(({ body: { comments } }) => {
+
 					expect(comments).toEqual([]);
 				});
 		});
