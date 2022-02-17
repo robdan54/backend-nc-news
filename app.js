@@ -9,6 +9,7 @@ const {
 	updateArticle,
 	fetchArticleById,
 	fetchCommentsByArticle,
+	sendComment,
 } = require('./controllers/controller');
 
 const {
@@ -29,9 +30,11 @@ app.get('/api/topics', fetchTopics);
 app.get('/api/articles', fetchArticles);
 app.get('/api/articles/:article_id', fetchArticleById);
 app.patch('/api/articles/:article_id', updateArticle);
-app.get('/api/articles/:article_id/comments', fetchCommentsByArticle);
 
 //comments
+
+app.get('/api/articles/:article_id/comments', fetchCommentsByArticle);
+app.post('/api/articles/:article_id/comments', sendComment);
 
 //users
 
