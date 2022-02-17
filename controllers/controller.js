@@ -86,7 +86,9 @@ exports.sendComment = (req, res, next) => {
 exports.removeComment = (req, res, next) => {
 	const commentId = req.params.comment_id;
 
-	deleteComment(commentId).then(() => {
+	Promise.all([deleteComment(commentId), doesResourceExist('comments', 'comment_id', commentId)]).then(() => {
 		res.status(204).send();
-	});
+	}).catch(next)
+
+	
 };

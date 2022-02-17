@@ -432,6 +432,21 @@ describe('/api/comments/:comment_id', () => {
 					expect(article.comment_count).toBe(0);
 				});
 		})
+		describe('DELETE ERRORS', () => {
+			test('should respond with 404 - Resource not found if given an id that does not exist', () => {
+				return request(app).delete('/api/comments/99999').expect(404).then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found')
+				});
+			});
+			test('should respond with 400 - Bad request if given an invalid comment id', () => {
+				return request(app)
+					.delete('/api/comments/Not-an-id')
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			})
+		});
 	});
 });
 
