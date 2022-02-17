@@ -230,7 +230,7 @@ describe('/api/articles/:article_id/comments', () => {
 					comments.forEach((comment) => {
 						expect(comment).toEqual(
 							expect.objectContaining({
-								article_id: expect.any(Number),
+								article_id: 1,
 								comment_id: expect.any(Number),
 								votes: expect.any(Number),
 								created_at: expect.any(String),
@@ -332,6 +332,15 @@ describe('/api/articles/:article_id/comments', () => {
 				return request(app)
 					.post('/api/articles/1/comments')
 					.send({ notACommentObject: 'or property' })
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			});
+			test('should return 400 Bad request if given a valid key, but with an invalid value', () => {
+				return request(app)
+					.post('/api/articles/1/comments')
+					.send({ username: 'NOT-A-USERNAME' , body: 'test body'})
 					.expect(400)
 					.then(({ body: { msg } }) => {
 						expect(msg).toBe('Bad request');
