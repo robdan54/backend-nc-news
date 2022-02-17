@@ -10,16 +10,31 @@ exports.selectTopics = async () => {
 	return topics.rows;
 };
 
-exports.selectArticles = async () => {
-	const articles = await db.query(
-		`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comment_id) AS INT) AS comment_count
-		 FROM articles 
-		 LEFT JOIN comments ON comments.article_id = articles.article_id
-		 GROUP BY articles.article_id
-		 ORDER BY created_at DESC;`
-	);
+exports.selectArticles = async (sort_by) => {
+	if (!sort_by) sort_by = 'created_at';
 
-	return articles.rows;
+	const validSortBys = [
+		'created_at',
+		'article_id',
+		'author',
+		'title',
+		'topic',
+		'votes',
+		'comment_count',
+	];
+
+	if (validSortBys.includes(sort_by)) {
+		const articles = await db.query(
+			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comment_id) AS INT) AS comment_count
+			 FROM articles 
+			 LEFT JOIN comments ON comments.article_id = articles.article_id
+			 GROUP BY articles.article_id
+			 ORDER BY ${sort_by} DESC;`
+		);
+		return articles.rows;
+	} else {
+		return Promise.reject({status : 400, msg : 'Invalid sort_by'})
+	}
 };
 
 exports.selectArticleById = async (articleId) => {
@@ -65,7 +80,7 @@ exports.doesResourceExist = async (table, column, value) => {
 
 	if (testId.rows.length === 0) {
 		return Promise.reject({ status: 404, msg: 'Resource not found' });
-	} else {return Promise.resolve()}
+	}
 };
 
 exports.selectCommentsByArticle = async (articleId) => {
@@ -80,8 +95,10 @@ exports.selectCommentsByArticle = async (articleId) => {
 
 exports.postComment = async (commentInfo, articleId) => {
 	const { body, username } = commentInfo;
-	const created_at = new Date(Date.now())
-	const { rows: [comment] } = await db.query(
+	const created_at = new Date(Date.now());
+	const {
+		rows: [comment],
+	} = await db.query(
 		`INSERT INTO comments 
 			(body, author, article_id, votes, created_at)
 		VALUES
@@ -89,5 +106,5 @@ exports.postComment = async (commentInfo, articleId) => {
 		RETURNING *;`,
 		[body, username, articleId, created_at]
 	);
-	return comment
+	return comment;
 };

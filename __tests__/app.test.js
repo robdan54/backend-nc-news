@@ -217,6 +217,27 @@ describe('/api/articles', () => {
 					});
 				});
 		});
+		describe('Queries', () => {
+			test('should allow the user to specify a column to sort_by and sort by that column defaults to descending', () => {
+				const article_idTest = request(app)
+					.get('/api/articles?sort_by=article_id')
+					.expect(200)
+					.then(({ body }) => {
+						const { articles } = body;
+						expect(articles).toBeSortedBy('article_id', {descending:true})
+						
+					});
+				const comment_countTest = request(app)
+					.get('/api/articles?sort_by=comment_count')
+					.expect(200)
+					.then(({ body }) => {
+						const { articles } = body;
+						expect(articles).toBeSortedBy('comment_count', { descending: true });
+					});
+				return Promise.all([article_idTest, article_idTest]);
+			});
+			
+		});
 	});
 });
 
