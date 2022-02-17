@@ -97,9 +97,9 @@ exports.patchArticle = async (inc_votes, articleID) => {
 exports.doesResourceExist = async (table, column, value) => {
 	let queryStr = format(`SELECT * FROM %I WHERE %I = $1;`, table, column);
 
-	const testId = await db.query(queryStr, [value]);
+	const testArray = await db.query(queryStr, [value]);
 
-	if (testId.rows.length === 0) {
+	if (testArray.rows.length === 0) {
 		return Promise.reject({ status: 404, msg: 'Resource not found' });
 	}
 };
@@ -116,16 +116,15 @@ exports.selectCommentsByArticle = async (articleId) => {
 
 exports.postComment = async (commentInfo, articleId) => {
 	const { body, username } = commentInfo;
-	const created_at = new Date(Date.now());
 	const {
 		rows: [comment],
 	} = await db.query(
 		`INSERT INTO comments 
-			(body, author, article_id, votes, created_at)
+			(body, author, article_id, votes)
 		VALUES
-			($1, $2, $3 , 0 , $4)
+			($1, $2, $3 , 0)
 		RETURNING *;`,
-		[body, username, articleId, created_at]
+		[body, username, articleId]
 	);
 	return comment;
 };
