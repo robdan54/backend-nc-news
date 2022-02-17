@@ -10,6 +10,7 @@ const {
 	doesResourceExist,
 	selectCommentsByArticle,
 	postComment,
+	deleteComment,
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -20,9 +21,11 @@ exports.fetchTopics = (req, res, next) => {
 
 exports.fetchArticles = (req, res, next) => {
 	const { sort_by, order, topic } = req.query;
-	selectArticles(sort_by, order, topic).then((articles) => {
-		res.status(200).send({ articles });
-	}).catch(next);
+	selectArticles(sort_by, order, topic)
+		.then((articles) => {
+			res.status(200).send({ articles });
+		})
+		.catch(next);
 };
 
 exports.fetchArticleById = (req, res, next) => {
@@ -78,4 +81,12 @@ exports.sendComment = (req, res, next) => {
 			res.status(201).send({ comment });
 		})
 		.catch(next);
+};
+
+exports.removeComment = (req, res, next) => {
+	const commentId = req.params.comment_id;
+
+	deleteComment(commentId).then(() => {
+		res.status(204).send();
+	});
 };

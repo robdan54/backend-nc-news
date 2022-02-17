@@ -129,3 +129,10 @@ exports.postComment = async (commentInfo, articleId) => {
 	);
 	return comment;
 };
+
+exports.deleteComment = async (commentId) => {
+	await db.query(
+		`DELETE FROM comments 
+		WHERE comment_id = $1`,[commentId]
+	)
+}
