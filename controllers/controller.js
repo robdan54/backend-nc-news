@@ -99,6 +99,6 @@ exports.removeComment = (req, res, next) => {
 
 exports.fetchEndpoints = (req, res, next) => {
 	getEndpoints().then((endpoints) => {
-		res.status(200).send({ endpoints })
-	})
+		res.status(200).send({ endpoints });
+	});
 };
