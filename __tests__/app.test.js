@@ -230,6 +230,7 @@ describe('/api/articles/:article_id/comments', () => {
 					comments.forEach((comment) => {
 						expect(comment).toEqual(
 							expect.objectContaining({
+								article_id: expect.any(Number),
 								comment_id: expect.any(Number),
 								votes: expect.any(Number),
 								created_at: expect.any(String),
@@ -263,6 +264,74 @@ describe('/api/articles/:article_id/comments', () => {
 			test('should return 400 bad request if given an invalid id format', () => {
 				return request(app)
 					.get('/api/articles/not-an-Id/comments')
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			});
+		});
+	});
+	describe('POST', () => {
+		test('should respond with 201 and the new comment object after receiving a username and body', () => {
+			return request(app)
+				.post('/api/articles/2/comments')
+				.send({ username: 'butter_bridge', body: 'test body' })
+				.expect(201)
+				.then(({ body: { comment } }) => {
+					expect(comment).toEqual({
+						comment_id: 19,
+						votes: 0,
+						created_at: expect.any(String),
+						author: 'butter_bridge',
+						body: 'test body',
+						article_id: 2,
+					});
+				});
+		});
+		test('should add a new comment to the article', () => {
+			return request(app)
+				.post('/api/articles/2/comments')
+				.send({ username: 'butter_bridge', body: 'test body' })
+				.then(() => {
+					return request(app)
+						.get('/api/articles/2/comments')
+						.then(({ body: { comments } }) => {
+							expect(comments).toEqual([
+								{
+									comment_id: 19,
+									votes: 0,
+									created_at: expect.any(String),
+									author: 'butter_bridge',
+									body: 'test body',
+									article_id: 2,
+								},
+							]);
+						});
+				});
+		});
+		describe('POST ERRORS', () => {
+			test('should return 404 - Resource not found if given a valid id but the article does not exist', () => {
+				return request(app)
+					.post('/api/articles/99999/comments')
+					.send({ username: 'butter_bridge', body: 'test body' })
+					.expect(404)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Resource not found');
+					});
+			});
+			test('should return 400 Bad request if given an invalid id type', () => {
+				return request(app)
+					.post('/api/articles/this-is-not-an-id/comments')
+					.send({ username: 'butter_bridge', body: 'test body' })
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			});
+			test('should return 400 Bad request if given an invalid comment object', () => {
+				return request(app)
+					.post('/api/articles/1/comments')
+					.send({ notACommentObject: 'or property' })
 					.expect(400)
 					.then(({ body: { msg } }) => {
 						expect(msg).toBe('Bad request');

@@ -9,6 +9,7 @@ const {
 	selectArticles,
 	doesResourceExist,
 	selectCommentsByArticle,
+	postComment,
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -60,6 +61,20 @@ exports.fetchCommentsByArticle = (req, res, next) => {
 	])
 		.then(([comments]) => {
 			res.status(200).send({ comments });
+		})
+		.catch(next);
+};
+
+exports.sendComment = (req, res, next) => {
+	const articleId = req.params.article_id;
+	const { body } = req;
+
+	doesResourceExist('articles', 'article_id', articleId)      //need to check if resource exists before trying to post as otherwise violates foreign key constraint in comments table
+		.then(() => {
+			return postComment(body, articleId);
+		})
+		.then((comment) => {
+			res.status(201).send({ comment });
 		})
 		.catch(next);
 };

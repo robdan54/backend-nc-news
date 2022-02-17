@@ -31,7 +31,7 @@ exports.selectArticleById = async (articleId) => {
 		 GROUP BY articles.article_id;`,
 		[articleId]
 	);
-	
+
 	return article.rows[0];
 };
 
@@ -65,12 +65,29 @@ exports.doesResourceExist = async (table, column, value) => {
 
 	if (testId.rows.length === 0) {
 		return Promise.reject({ status: 404, msg: 'Resource not found' });
-	}
+	} else {return Promise.resolve()}
 };
 
 exports.selectCommentsByArticle = async (articleId) => {
-	const { rows } = await db.query(`SELECT * FROM comments
-	WHERE article_id = $1;`, [articleId])
-	
-	return rows
-}
+	const { rows } = await db.query(
+		`SELECT * FROM comments
+	WHERE article_id = $1;`,
+		[articleId]
+	);
+
+	return rows;
+};
+
+exports.postComment = async (commentInfo, articleId) => {
+	const { body, username } = commentInfo;
+	const created_at = new Date(Date.now())
+	const { rows: [comment] } = await db.query(
+		`INSERT INTO comments 
+			(body, author, article_id, votes, created_at)
+		VALUES
+			($1, $2, $3 , 0 , $4)
+		RETURNING *;`,
+		[body, username, articleId, created_at]
+	);
+	return comment
+};
