@@ -11,6 +11,7 @@ const {
 	fetchCommentsByArticle,
 	sendComment,
 	removeComment,
+	fetchEndpoints,
 } = require('./controllers/controller');
 
 const {
@@ -21,6 +22,10 @@ const {
 
 const app = express();
 app.use(express.json());
+
+//api
+
+app.get('/api', fetchEndpoints)
 
 //topics
 

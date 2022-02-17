@@ -2,6 +2,7 @@
 
 const db = require('../db/connection');
 const format = require('pg-format');
+const fs = require('fs/promises')
 
 exports.selectTopics = async () => {
 	const topics = await db.query(`
@@ -134,4 +135,10 @@ exports.deleteComment = async (commentId) => {
 		`DELETE FROM comments 
 		WHERE comment_id = $1`,[commentId]
 	)
+}
+
+exports.getEndpoints = async () => {
+	
+	const endpoints = await fs.readFile('endpoints.json', 'utf8');
+	return JSON.parse(endpoints);
 }

@@ -418,16 +418,23 @@ describe('/api/articles/:article_id/comments', () => {
 describe('/api/comments/:comment_id', () => {
 	describe('DELETE', () => {
 		test('should respond 204 and no content', () => {
-			return request(app).delete('/api/comments/1').expect(204).then(({body}) => {
-				expect(body).toEqual({})
-			})
+			return request(app)
+				.delete('/api/comments/1')
+				.expect(204)
+				.then(({ body }) => {
+					expect(body).toEqual({});
+				});
 		});
 		test('should remove the comment from the data base', () => {
-			return request(app).delete('/api/comments/16').expect(204).then(() => {
-				return request(app).get('/api/articles/6/comments').expect(200)
-			}).then(({ body:{comments} }) => {
-				expect(comments).toEqual([])
-			})
+			return request(app)
+				.delete('/api/comments/16')
+				.expect(204)
+				.then(() => {
+					return request(app).get('/api/articles/6/comments').expect(200);
+				})
+				.then(({ body: { comments } }) => {
+					expect(comments).toEqual([]);
+				});
 		});
 		test('should update comment count on articles when comments are deleted', () => {
 			return request(app)
@@ -439,12 +446,15 @@ describe('/api/comments/:comment_id', () => {
 				.then(({ body: { article } }) => {
 					expect(article.comment_count).toBe(0);
 				});
-		})
+		});
 		describe('DELETE ERRORS', () => {
 			test('should respond with 404 - Resource not found if given an id that does not exist', () => {
-				return request(app).delete('/api/comments/99999').expect(404).then(({ body: { msg } }) => {
-					expect(msg).toBe('Resource not found')
-				});
+				return request(app)
+					.delete('/api/comments/99999')
+					.expect(404)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Resource not found');
+					});
 			});
 			test('should respond with 400 - Bad request if given an invalid comment id', () => {
 				return request(app)
@@ -453,7 +463,132 @@ describe('/api/comments/:comment_id', () => {
 					.then(({ body: { msg } }) => {
 						expect(msg).toBe('Bad request');
 					});
-			})
+			});
+		});
+	});
+});
+
+describe('/api', () => {
+	describe('GET', () => {
+		test('should respond with a JSON with a description of all endpoints', () => {
+			return request(app)
+				.get('/api')
+				.expect(200)
+				.then(({ body }) => {
+					expect(body).toEqual({
+						endpoints: {
+							'GET /api': {
+								description:
+									'serves up a json representation of all the available endpoints of the api',
+							},
+							'GET /api/topics': {
+								description: 'serves an array of all topics',
+								queries: [],
+								exampleResponse: {
+									topics: [{ slug: 'football', description: 'Footie!' }],
+								},
+							},
+							'GET /api/articles': {
+								description:
+									'serves an array of all articles, can be queried by topic, sort_by or order',
+								queries: ['topic', 'sort_by', 'order'],
+								exampleResponse: {
+									articles: [
+										{
+											article_id: 1,
+											title: 'Seafood substitutions are increasing',
+											topic: 'cooking',
+											author: 'weegembump',
+											created_at: 1527695953341,
+											votes: 0,
+										},
+									],
+								},
+							},
+							'GET /api/articles/:article_id': {
+								description: 'servers a single article object',
+								queries: [],
+								exampleResponse: {
+									article: {
+										article_id: 1,
+										title: 'Seafood substitutions are increasing',
+										topic: 'cooking',
+										author: 'weegembump',
+										body: 'Text from the article..',
+										created_at: 1527695953341,
+										votes: 0,
+										comment_count: 12,
+									},
+								},
+							},
+							'PATCH /api/articles/:article_id': {
+								description:
+									'allows an articles votes to be increased or decreased by a given amount and responds with the updated article',
+								queries: [],
+								exampleRequestBody: { inc_votes: 3 },
+								exampleResponse: {
+									article: {
+										article_id: 1,
+										title: 'Seafood substitutions are increasing',
+										topic: 'cooking',
+										author: 'weegembump',
+										body: 'Text from the article..',
+										created_at: 1527695953341,
+										votes: 0,
+										comment_count: 15,
+									},
+								},
+							},
+							'GET /api/users': {
+								description: 'servers and array of all users',
+								queries: [],
+								'example response': {
+									users: [{ username: 'weegembump' }],
+								},
+							},
+							'GET /api/articles/:article_id/comments': {
+								description:
+									'servers an array of comments for the given article',
+								queries: [],
+								exampleResponse: {
+									comments: [
+										{
+											body: 'comment text',
+											votes: 18,
+											author: 'weegembump',
+											article_id: 1,
+											created_at: 10000000000,
+										},
+									],
+								},
+							},
+							'POST /api/articles/:article_id/comments': {
+								description:
+									'Creates a new comment for the given article and responds with the new comment object',
+								queries: [],
+								exampleRequestBody: {
+									username: 'weegembump',
+									body: 'comment text',
+								},
+								exampleResponse: {
+									comments: [
+										{
+											body: 'comment text',
+											votes: 0,
+											author: 'weegembump',
+											article_id: 1,
+											created_at: 10000000000,
+										},
+									],
+								},
+							},
+							'DELETE /api/comments/:comment_id': {
+								description: 'Removes the given comment from the database',
+								queries: [],
+							},
+						},
+					});
+				});
 		});
 	});
 });

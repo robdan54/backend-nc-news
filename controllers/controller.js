@@ -11,6 +11,7 @@ const {
 	selectCommentsByArticle,
 	postComment,
 	deleteComment,
+	getEndpoints,
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -86,9 +87,18 @@ exports.sendComment = (req, res, next) => {
 exports.removeComment = (req, res, next) => {
 	const commentId = req.params.comment_id;
 
-	Promise.all([deleteComment(commentId), doesResourceExist('comments', 'comment_id', commentId)]).then(() => {
-		res.status(204).send();
-	}).catch(next)
+	Promise.all([
+		deleteComment(commentId),
+		doesResourceExist('comments', 'comment_id', commentId),
+	])
+		.then(() => {
+			res.status(204).send();
+		})
+		.catch(next);
+};
 
-	
+exports.fetchEndpoints = (req, res, next) => {
+	getEndpoints().then((endpoints) => {
+		res.status(200).send({ endpoints })
+	})
 };
