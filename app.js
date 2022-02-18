@@ -1,6 +1,7 @@
 /** @format */
 
 const express = require('express');
+const apiRouter = require('./routes/api-router')
 
 const {
 	fetchTopics,
@@ -23,29 +24,8 @@ const {
 const app = express();
 app.use(express.json());
 
-//api
+app.use('/api', apiRouter)
 
-app.get('/api', fetchEndpoints)
-
-//topics
-
-app.get('/api/topics', fetchTopics);
-
-//articles
-
-app.get('/api/articles', fetchArticles);
-app.get('/api/articles/:article_id', fetchArticleById);
-app.patch('/api/articles/:article_id', updateArticle);
-
-//comments
-
-app.get('/api/articles/:article_id/comments', fetchCommentsByArticle);
-app.post('/api/articles/:article_id/comments', sendComment);
-app.delete('/api/comments/:comment_id', removeComment)
-
-//users
-
-app.get('/api/users', fetchUsers);
 
 //errors
 
