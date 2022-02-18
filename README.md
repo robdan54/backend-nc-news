@@ -44,3 +44,11 @@ The test scripts will connect to the test database automatically so there is no 
 node.js v17.4.0
 
 Postgres 8.7.3
+
+## Other dependencies
+
+dotenv
+
+express
+
+pg-format
