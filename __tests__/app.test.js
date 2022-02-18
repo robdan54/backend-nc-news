@@ -313,7 +313,6 @@ describe('/api/articles/:article_id/comments', () => {
 				.get('/api/articles/2/comments')
 				.expect(200)
 				.then(({ body: { comments } }) => {
-
 					expect(comments).toEqual([]);
 				});
 		});
@@ -405,7 +404,7 @@ describe('/api/articles/:article_id/comments', () => {
 			test('should return 400 Bad request if given a valid key, but with an invalid value', () => {
 				return request(app)
 					.post('/api/articles/1/comments')
-					.send({ username: 'NOT-A-USERNAME' , body: 'test body'})
+					.send({ username: 'NOT-A-USERNAME', body: 'test body' })
 					.expect(400)
 					.then(({ body: { msg } }) => {
 						expect(msg).toBe('Bad request');
@@ -589,6 +588,34 @@ describe('/api', () => {
 						},
 					});
 				});
+		});
+	});
+});
+
+describe('/api/users/:username', () => {
+	describe('GET', () => {
+		test('should respond with the corresponding user object', () => {
+			return request(app)
+				.get('/api/users/butter_bridge')
+				.expect(200)
+				.then(({ body: { user } }) => {
+					expect(user).toEqual(
+						expect.objectContaining({
+							username: 'butter_bridge',
+							avatar_url:
+								'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+							name: 'jonny'
+						})
+					);
+				});
+		});
+		describe('GET ERRORS', () => {
+			test('should return 404 resource not found if given a name that is not in use', () => {
+				return request(app).get('/api/users/NOT-A-USER').expect(404).then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found')
+				})
+			});
+			
 		});
 	});
 });
