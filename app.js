@@ -1,7 +1,8 @@
 /** @format */
 
 const express = require('express');
-const apiRouter = require('./routes/api-router')
+const apiRouter = require('./routes/api-router');
+const cors = require('cors');
 
 const {
 	fetchTopics,
@@ -22,10 +23,10 @@ const {
 } = require('./Errors/error-handling.js');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-app.use('/api', apiRouter)
-
+app.use('/api', apiRouter);
 
 //errors
 
