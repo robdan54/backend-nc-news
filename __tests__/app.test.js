@@ -553,6 +553,7 @@ describe('/api', () => {
 								exampleResponse: {
 									comments: [
 										{
+											comment_id: 1,
 											body: 'comment text',
 											votes: 18,
 											author: 'weegembump',
@@ -573,6 +574,7 @@ describe('/api', () => {
 								exampleResponse: {
 									comments: [
 										{
+											comment_id: 1,
 											body: 'comment text',
 											votes: 0,
 											author: 'weegembump',
