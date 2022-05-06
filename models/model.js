@@ -2,7 +2,8 @@
 
 const db = require('../db/connection');
 const format = require('pg-format');
-const fs = require('fs/promises')
+const fs = require('fs/promises');
+const { user } = require('pg/lib/defaults');
 
 exports.selectTopics = async () => {
 	const topics = await db.query(`
@@ -42,7 +43,7 @@ exports.selectArticles = async (sort_by, order, topic) => {
 
 	if (validSortBys.includes(sort_by)) {
 		if (validOrder.includes(order.toUpperCase())) {
-			queryStr += ` ORDER BY ${sort_by} ${order}`;
+			queryStr += ` ORDER BY ${sort_by} ${order};`;
 		} else {
 			return Promise.reject({ status: 400, msg: 'Invalid order' });
 		}
@@ -50,7 +51,7 @@ exports.selectArticles = async (sort_by, order, topic) => {
 		return Promise.reject({ status: 400, msg: 'Invalid sort_by' });
 	}
 
-	const { rows } = await db.query(queryStr + ';', queryArr);
+	const { rows } = await db.query(queryStr, queryArr);
 
 	if (rows.length === 0) {
 		return Promise.reject({ status: 404, msg: 'Topic not found' });
@@ -133,12 +134,25 @@ exports.postComment = async (commentInfo, articleId) => {
 exports.deleteComment = async (commentId) => {
 	await db.query(
 		`DELETE FROM comments 
-		WHERE comment_id = $1`,[commentId]
-	)
-}
+		WHERE comment_id = $1`,
+		[commentId]
+	);
+};
 
 exports.getEndpoints = async () => {
-	
 	const endpoints = await fs.readFile('endpoints.json', 'utf8');
 	return JSON.parse(endpoints);
-}
+};
+
+exports.selectUser = async (username) => {
+	const {
+		rows: [user],
+	} = await db.query(
+		`SELECT username, avatar_url, name FROM users
+		WHERE username = $1;
+		`,
+		[username]
+	);
+
+	return user;
+};

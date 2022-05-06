@@ -4,17 +4,6 @@ const express = require('express');
 const apiRouter = require('./routes/api-router');
 const cors = require('cors');
 
-const {
-	fetchTopics,
-	fetchArticles,
-	fetchUsers,
-	updateArticle,
-	fetchArticleById,
-	fetchCommentsByArticle,
-	sendComment,
-	removeComment,
-	fetchEndpoints,
-} = require('./controllers/controller');
 
 const {
 	handleCustomErrors,

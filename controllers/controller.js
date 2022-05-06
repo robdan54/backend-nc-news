@@ -12,6 +12,7 @@ const {
 	postComment,
 	deleteComment,
 	getEndpoints,
+	selectUser,
 } = require('../models/model.js');
 
 exports.fetchTopics = (req, res, next) => {
@@ -92,7 +93,7 @@ exports.removeComment = (req, res, next) => {
 		doesResourceExist('comments', 'comment_id', commentId),
 	])
 		.then(() => {
-			res.status(204).send();
+			res.sendStatus(204);
 		})
 		.catch(next);
 };
@@ -101,4 +102,17 @@ exports.fetchEndpoints = (req, res, next) => {
 	getEndpoints().then((endpoints) => {
 		res.status(200).send({ endpoints });
 	});
+};
+
+exports.fetchUserByUsername = (req, res, next) => {
+	const { username } = req.params;
+
+	Promise.all([
+		selectUser(username),
+		doesResourceExist('users', 'username', username),
+	])
+		.then(([user]) => {
+			res.status(200).send({ user });
+		})
+		.catch(next);
 };
