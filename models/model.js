@@ -3,7 +3,6 @@
 const db = require('../db/connection');
 const format = require('pg-format');
 const fs = require('fs/promises');
-const { user } = require('pg/lib/defaults');
 
 exports.selectTopics = async () => {
 	const topics = await db.query(`
