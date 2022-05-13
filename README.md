@@ -1,11 +1,14 @@
 # Northcoders News API
 
-Must add a .env.developer and a .env.test file to connect to the correct developer and test databases respectively
+Must add a .env.developer and a .env.test file to connect to the correct developer and test databases respectively. The .env file should have a single line of the format 
+```bash
+PGDATABASE=*database_name*
+```
 
 ## Link to hosted site 
-```html
- https://nc-news-robin.herokuapp.com/api
-```
+
+ [Heroku hosted site](https://nc-news-robin.herokuapp.com/api)
+
 
 ## Description
 
